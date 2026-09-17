@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 CLSOFTLAB (씨엘소프트랩), Dr. Lee Il-guk (이일국)
+name: CI
+
+on:
+  push:
+    branches: [ main, master, dev ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    name: Node checks (node check.mjs)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Run project checks
+        run: node check.mjs
+      - name: Syntax check all JS
+        run: |
+          for f in *.js *.mjs; do
+            node --check "$f"
+          done

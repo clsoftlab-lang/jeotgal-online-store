@@ -1,0 +1,36 @@
+{
+  "presets": [
+    {
+      "id": "gs-premium",
+      "name": "명인 프리미엄 3종 세트",
+      "desc": "저염 명란·성게알젓·전복 내장젓으로 구성한 최고급 선물세트. 명절·귀한 분 선물에 추천.",
+      "items": ["p-myeongnan-low", "p-seonge", "p-jeonbok"],
+      "boxPrice": 5000,
+      "svg": "giftbox"
+    },
+    {
+      "id": "gs-bapdoduk",
+      "name": "밥도둑 4종 세트",
+      "desc": "간장 꽃게장·양념 명란·오징어젓·낙지젓. 밥 한 그릇이 부족한 밥도둑 모음.",
+      "items": ["p-kkotgejang", "p-myeongnan-spicy", "p-ojingeo", "p-nakji"],
+      "boxPrice": 4000,
+      "svg": "giftbox"
+    },
+    {
+      "id": "gs-namdo",
+      "name": "남도 손맛 3종 세트",
+      "desc": "여수 갈치속젓·토하젓·강화 어리굴젓. 남도 밥상의 정통 손맛.",
+      "items": ["p-galchisok", "p-tomak", "p-eorigul"],
+      "boxPrice": 4000,
+      "svg": "giftbox"
+    },
+    {
+      "id": "gs-kimjang",
+      "name": "김장 필수 3종 세트",
+      "desc": "추젓 새우젓·멸치액젓·황석어젓. 김장철 감칠맛의 삼총사.",
+      "items": ["p-saeujeot-chujeot", "p-myeolchi", "p-hwangseoko"],
+      "boxPrice": 3000,
+      "svg": "giftbox"
+    }
+  ]
+}

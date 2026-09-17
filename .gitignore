@@ -1,0 +1,16 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Node (이 프로젝트는 no-build 정적 사이트이나 로컬 도구용)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# 로그 / 임시
+*.log
+tmp/
+.cache/

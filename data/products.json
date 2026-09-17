@@ -1,0 +1,405 @@
+{
+  "meta": {
+    "currency": "KRW",
+    "spiceLabels": ["순한맛", "약한 매움", "매콤", "아주 매콤"],
+    "useLabels": { "rice": "밥반찬", "gift": "선물", "cook": "요리용" }
+  },
+  "products": [
+    {
+      "id": "p-saeujeot-yukjeot",
+      "name": "광천 토굴 육젓 (오젓 새우젓)",
+      "category": "saeujeot", "categoryLabel": "새우젓",
+      "artisanId": "a-gwangcheon",
+      "origin": "충남 홍성 광천", "originCountry": "국산(서해)",
+      "spice": 0, "uses": ["rice", "cook"], "giftEligible": true,
+      "storage": "0~10°C 냉장 보관, 개봉 후 냉장 3개월",
+      "story": "음력 6월에 잡은 육젓만을 광천 토굴에서 6개월 이상 숙성했습니다. 살이 통통하고 붉은 빛이 도는 최상급 새우젓으로 김장과 찌개, 수육에 두루 씁니다.",
+      "weights": [ { "g": 250, "price": 12000 }, { "g": 500, "price": 21000 }, { "g": 1000, "price": 38000 } ],
+      "rating": 4.8, "coldChain": true, "svg": "shrimp",
+      "reviews": [
+        { "author": "미식가K", "rating": 5, "text": "김장에 넣으니 국물맛이 완전히 달라졌어요. 짜지 않고 감칠맛이 깊습니다." },
+        { "author": "수육러버", "rating": 5, "text": "통통한 살이 살아있어요. 수육에 곁들이니 최고." }
+      ]
+    },
+    {
+      "id": "p-saeujeot-chujeot",
+      "name": "가을 추젓 새우젓 (김장용)",
+      "category": "saeujeot", "categoryLabel": "새우젓",
+      "artisanId": "a-gwangcheon",
+      "origin": "충남 홍성 광천", "originCountry": "국산(서해)",
+      "spice": 0, "uses": ["cook"], "giftEligible": false,
+      "storage": "0~10°C 냉장 보관, 개봉 후 냉장 3개월",
+      "story": "가을에 잡은 잔새우로 담근 추젓입니다. 가격이 합리적이어서 김장과 나물 무침, 국간에 넉넉히 쓰기 좋습니다.",
+      "weights": [ { "g": 500, "price": 11000 }, { "g": 1000, "price": 19000 }, { "g": 2000, "price": 34000 } ],
+      "rating": 4.6, "coldChain": true, "svg": "shrimp",
+      "reviews": [
+        { "author": "김장고수", "rating": 5, "text": "매년 이맘때 대량으로 삽니다. 가성비 최고." }
+      ]
+    },
+    {
+      "id": "p-myeongnan-low",
+      "name": "기장 저염 명란젓 (백명란)",
+      "category": "myeongnan", "categoryLabel": "명란젓",
+      "artisanId": "a-busan",
+      "origin": "부산 기장 대변항", "originCountry": "국산(원료 러시아·미국산 명태알)",
+      "spice": 0, "uses": ["rice", "gift", "cook"], "giftEligible": true,
+      "storage": "-2~5°C 냉장, 장기 보관 시 냉동, 개봉 후 냉장 2주",
+      "story": "다시마 육수와 천일염으로만 간을 한 저염 백명란입니다. 짜지 않아 밥에 그대로, 파스타나 계란말이 재료로도 훌륭합니다.",
+      "weights": [ { "g": 200, "price": 16000 }, { "g": 400, "price": 29000 }, { "g": 500, "price": 35000 } ],
+      "rating": 4.9, "coldChain": true, "svg": "roe",
+      "reviews": [
+        { "author": "명란덕후", "rating": 5, "text": "덜 짜서 아이도 잘 먹어요. 명란파스타 만들어 먹으면 인생맛." },
+        { "author": "부산댁", "rating": 5, "text": "대변항 그 맛 그대로. 알이 꽉 찼어요." },
+        { "author": "직장인점심", "rating": 4, "text": "밥도둑 인정. 다만 금방 없어져요ㅠ" }
+      ]
+    },
+    {
+      "id": "p-myeongnan-spicy",
+      "name": "양념 명란젓 (고춧가루 코팅)",
+      "category": "myeongnan", "categoryLabel": "명란젓",
+      "artisanId": "a-busan",
+      "origin": "부산 기장 대변항", "originCountry": "국산(원료 명태알)",
+      "spice": 2, "uses": ["rice", "gift"], "giftEligible": true,
+      "storage": "-2~5°C 냉장, 개봉 후 냉장 2주",
+      "story": "고운 고춧가루로 옷을 입힌 매콤한 양념 명란입니다. 뜨거운 밥 위에 올리면 그 자체로 한 끼가 완성됩니다.",
+      "weights": [ { "g": 200, "price": 15000 }, { "g": 400, "price": 27000 } ],
+      "rating": 4.7, "coldChain": true, "svg": "roe",
+      "reviews": [
+        { "author": "매운맛중독", "rating": 5, "text": "적당히 매콤달콤. 김이랑 싸먹으면 끝." }
+      ]
+    },
+    {
+      "id": "p-ojingeo",
+      "name": "통영 한산도 오징어젓 (매콤)",
+      "category": "ojingeojeot", "categoryLabel": "오징어젓",
+      "artisanId": "a-tongyeong",
+      "origin": "경남 통영 한산도", "originCountry": "국산(남해)",
+      "spice": 2, "uses": ["rice"], "giftEligible": true,
+      "storage": "0~10°C 냉장, 개봉 후 냉장 1개월",
+      "story": "쫄깃한 오징어를 매콤달콤한 양념에 무쳤습니다. 씹을수록 감칠맛이 올라와 밥반찬으로 인기가 많습니다.",
+      "weights": [ { "g": 300, "price": 13000 }, { "g": 500, "price": 20000 } ],
+      "rating": 4.7, "coldChain": true, "svg": "squid",
+      "reviews": [
+        { "author": "밥한공기", "rating": 5, "text": "쫄깃하고 양념이 딱 좋아요." },
+        { "author": "도시락족", "rating": 4, "text": "반찬으로 최고. 조금 더 매웠으면." }
+      ]
+    },
+    {
+      "id": "p-changnan",
+      "name": "창난젓 (명태 창자젓)",
+      "category": "changnan", "categoryLabel": "창난젓",
+      "artisanId": "a-tongyeong",
+      "origin": "경남 통영", "originCountry": "국산(원료 명태)",
+      "spice": 2, "uses": ["rice"], "giftEligible": false,
+      "storage": "0~10°C 냉장, 개봉 후 냉장 3주",
+      "story": "오독오독 씹히는 식감이 매력인 창난젓입니다. 무채와 함께 무쳐 김밥, 비빔밥에 넣어도 좋습니다.",
+      "weights": [ { "g": 300, "price": 11000 }, { "g": 500, "price": 17000 } ],
+      "rating": 4.5, "coldChain": true, "svg": "squid",
+      "reviews": [
+        { "author": "오독오독", "rating": 5, "text": "식감이 진짜 좋아요. 비빔밥에 최고." }
+      ]
+    },
+    {
+      "id": "p-nakji",
+      "name": "낙지젓 (매콤 양념)",
+      "category": "nakjijeot", "categoryLabel": "낙지젓",
+      "artisanId": "a-yeosu",
+      "origin": "전남 여수", "originCountry": "국산(남해)",
+      "spice": 2, "uses": ["rice"], "giftEligible": true,
+      "storage": "0~10°C 냉장, 개봉 후 냉장 3주",
+      "story": "잘게 썬 낙지를 칼칼한 양념에 버무렸습니다. 참기름 한 방울 더하면 밥도둑이 따로 없습니다.",
+      "weights": [ { "g": 250, "price": 14000 }, { "g": 500, "price": 25000 } ],
+      "rating": 4.6, "coldChain": true, "svg": "octopus",
+      "reviews": [
+        { "author": "남도밥상", "rating": 5, "text": "참기름 넣고 비비면 그냥 끝납니다." }
+      ]
+    },
+    {
+      "id": "p-eorigul",
+      "name": "강화 어리굴젓 (칼칼)",
+      "category": "eorigul", "categoryLabel": "어리굴젓",
+      "artisanId": "a-ganghwa",
+      "origin": "인천 강화 갯벌", "originCountry": "국산(서해)",
+      "spice": 1, "uses": ["rice", "gift"], "giftEligible": true,
+      "storage": "0~5°C 냉장, 개봉 후 냉장 2주",
+      "story": "강화 갯벌에서 캔 석화를 고춧가루로 버무린 어리굴젓입니다. 굴 향이 살아있어 겨울철 밥상에 잘 어울립니다.",
+      "weights": [ { "g": 250, "price": 15000 }, { "g": 500, "price": 27000 } ],
+      "rating": 4.8, "coldChain": true, "svg": "oyster",
+      "reviews": [
+        { "author": "굴좋아", "rating": 5, "text": "굴 향이 살아있어요. 겨울에 딱." },
+        { "author": "강화토박이", "rating": 5, "text": "어릴 때 먹던 그 맛." }
+      ]
+    },
+    {
+      "id": "p-jogae",
+      "name": "조개젓 (담백)",
+      "category": "jogaejeot", "categoryLabel": "조개젓",
+      "artisanId": "a-ganghwa",
+      "origin": "인천 강화", "originCountry": "국산(서해)",
+      "spice": 1, "uses": ["rice"], "giftEligible": false,
+      "storage": "0~10°C 냉장, 개봉 후 냉장 3주",
+      "story": "속살이 통통한 바지락으로 담근 담백한 조개젓입니다. 풋고추와 참기름을 더해 무치면 여름 밥반찬으로 그만입니다.",
+      "weights": [ { "g": 300, "price": 10000 }, { "g": 500, "price": 16000 } ],
+      "rating": 4.5, "coldChain": true, "svg": "clam",
+      "reviews": [
+        { "author": "여름밥상", "rating": 4, "text": "담백하고 좋아요. 풋고추 필수." }
+      ]
+    },
+    {
+      "id": "p-galchisok",
+      "name": "여수 갈치속젓",
+      "category": "galchisok", "categoryLabel": "갈치속젓",
+      "artisanId": "a-yeosu",
+      "origin": "전남 여수", "originCountry": "국산(남해)",
+      "spice": 1, "uses": ["rice", "cook"], "giftEligible": true,
+      "storage": "0~10°C 냉장, 개봉 후 냉장 2개월",
+      "story": "갈치 내장을 즉시 염장해 깊은 감칠맛을 낸 갈치속젓입니다. 김장 양념이나 겉절이에 넣으면 남도식 깊은 맛이 납니다.",
+      "weights": [ { "g": 250, "price": 13000 }, { "g": 500, "price": 23000 } ],
+      "rating": 4.7, "coldChain": true, "svg": "hairtail",
+      "reviews": [
+        { "author": "남도김치", "rating": 5, "text": "김장에 넣으면 감칠맛이 완전 다릅니다." }
+      ]
+    },
+    {
+      "id": "p-myeolchi",
+      "name": "남해 멸치액젓 (2년 숙성)",
+      "category": "myeolchijeot", "categoryLabel": "멸치젓",
+      "artisanId": "a-tongyeong",
+      "origin": "경남 남해", "originCountry": "국산(남해)",
+      "spice": 0, "uses": ["cook"], "giftEligible": false,
+      "storage": "직사광선 피해 서늘한 곳, 개봉 후 냉장",
+      "story": "남해 멸치를 2년간 자연 발효시켜 만든 멸치액젓입니다. 김치와 나물, 국물 요리의 감칠맛을 책임집니다.",
+      "weights": [ { "g": 500, "price": 9000 }, { "g": 1000, "price": 15000 } ],
+      "rating": 4.6, "coldChain": false, "svg": "anchovy",
+      "reviews": [
+        { "author": "김치의달인", "rating": 5, "text": "깔끔한 감칠맛. 김치 담글 때 이것만 씁니다." }
+      ]
+    },
+    {
+      "id": "p-hwangseoko",
+      "name": "황석어젓 (황새기젓)",
+      "category": "hwangseoko", "categoryLabel": "황석어젓",
+      "artisanId": "a-gwangcheon",
+      "origin": "충남 서천", "originCountry": "국산(서해)",
+      "spice": 0, "uses": ["cook"], "giftEligible": false,
+      "storage": "0~10°C 냉장, 개봉 후 냉장 2개월",
+      "story": "봄에 잡은 황석어를 통째로 염장한 젓갈입니다. 곰삭은 깊은 맛이 김장의 숨은 비법입니다.",
+      "weights": [ { "g": 500, "price": 12000 }, { "g": 1000, "price": 21000 } ],
+      "rating": 4.4, "coldChain": true, "svg": "anchovy",
+      "reviews": [
+        { "author": "전라도손맛", "rating": 5, "text": "김장 김치에 넣으면 곰삭은 맛이 일품." }
+      ]
+    },
+    {
+      "id": "p-bandaengi",
+      "name": "밴댕이젓",
+      "category": "bandaengi", "categoryLabel": "밴댕이젓",
+      "artisanId": "a-ganghwa",
+      "origin": "인천 강화", "originCountry": "국산(서해)",
+      "spice": 0, "uses": ["cook"], "giftEligible": false,
+      "storage": "0~10°C 냉장, 개봉 후 냉장 2개월",
+      "story": "강화 앞바다 밴댕이로 담근 젓갈입니다. 진하고 구수한 맛이 특징으로 김장과 젓국에 씁니다.",
+      "weights": [ { "g": 500, "price": 11000 }, { "g": 1000, "price": 19000 } ],
+      "rating": 4.3, "coldChain": true, "svg": "anchovy",
+      "reviews": [
+        { "author": "강화손맛", "rating": 4, "text": "구수하고 진해요. 젓국용으로 좋음." }
+      ]
+    },
+    {
+      "id": "p-garibi",
+      "name": "가리비 관자젓 (별미)",
+      "category": "garibi", "categoryLabel": "가리비젓",
+      "artisanId": "a-tongyeong",
+      "origin": "경남 통영", "originCountry": "국산(남해)",
+      "spice": 1, "uses": ["rice", "gift"], "giftEligible": true,
+      "storage": "0~5°C 냉장, 개봉 후 냉장 2주",
+      "story": "가리비 관자를 살짝 양념한 별미 젓갈입니다. 쫄깃하고 담백해 술안주와 밥반찬 모두 훌륭합니다.",
+      "weights": [ { "g": 200, "price": 18000 }, { "g": 400, "price": 33000 } ],
+      "rating": 4.7, "coldChain": true, "svg": "clam",
+      "reviews": [
+        { "author": "술꾼", "rating": 5, "text": "안주로 최고. 쫄깃함이 살아있어요." }
+      ]
+    },
+    {
+      "id": "p-seonge",
+      "name": "성게알젓 (우니)",
+      "category": "seonge", "categoryLabel": "성게젓",
+      "artisanId": "a-tongyeong",
+      "origin": "경남 통영", "originCountry": "국산(남해)",
+      "spice": 0, "uses": ["gift"], "giftEligible": true,
+      "storage": "-2~2°C 냉장, 개봉 즉시 섭취 권장",
+      "story": "귀한 성게알을 소금간만으로 담근 프리미엄 젓갈입니다. 따뜻한 밥, 성게알비빔밥으로 즐기는 최고급 별미입니다.",
+      "weights": [ { "g": 100, "price": 32000 }, { "g": 200, "price": 60000 } ],
+      "rating": 4.9, "coldChain": true, "svg": "urchin",
+      "reviews": [
+        { "author": "미식가K", "rating": 5, "text": "성게비빔밥 해먹으면 호텔맛. 선물용으로 최고." }
+      ]
+    },
+    {
+      "id": "p-jeonbok",
+      "name": "전복 내장젓 (게웃젓)",
+      "category": "jeonbok", "categoryLabel": "전복젓",
+      "artisanId": "a-yeosu",
+      "origin": "전남 완도", "originCountry": "국산(남해)",
+      "spice": 0, "uses": ["gift", "cook"], "giftEligible": true,
+      "storage": "-2~5°C 냉장, 개봉 후 냉장 2주",
+      "story": "전복 내장으로 담근 제주식 게웃젓입니다. 바다 향이 진하며 전복죽이나 밥에 비벼 먹으면 별미입니다.",
+      "weights": [ { "g": 150, "price": 22000 }, { "g": 300, "price": 40000 } ],
+      "rating": 4.6, "coldChain": true, "svg": "oyster",
+      "reviews": [
+        { "author": "완도맛집", "rating": 5, "text": "바다향이 진해요. 전복죽에 넣으면 고급짐." }
+      ]
+    },
+    {
+      "id": "p-kkotgejang",
+      "name": "간장 꽃게장 (양념 아님)",
+      "category": "gejang", "categoryLabel": "게장",
+      "artisanId": "a-ganghwa",
+      "origin": "인천 연평도", "originCountry": "국산(서해)",
+      "spice": 0, "uses": ["rice", "gift"], "giftEligible": true,
+      "storage": "-2~5°C 냉장, 개봉 후 냉장 1주, 장기 냉동",
+      "story": "연평도 알배기 꽃게를 특제 간장에 숙성했습니다. 살이 꽉 찬 밥도둑의 대명사, 선물용으로도 인기입니다.",
+      "weights": [ { "g": 500, "price": 29000 }, { "g": 1000, "price": 54000 } ],
+      "rating": 4.8, "coldChain": true, "svg": "crab",
+      "reviews": [
+        { "author": "밥도둑헌터", "rating": 5, "text": "간장 밸런스가 예술. 살이 꽉 찼어요." },
+        { "author": "선물용", "rating": 5, "text": "부모님 선물로 드렸는데 극찬받음." }
+      ]
+    },
+    {
+      "id": "p-yangnyeom-gejang",
+      "name": "양념 꽃게장 (매콤)",
+      "category": "gejang", "categoryLabel": "게장",
+      "artisanId": "a-ganghwa",
+      "origin": "인천 연평도", "originCountry": "국산(서해)",
+      "spice": 2, "uses": ["rice"], "giftEligible": true,
+      "storage": "-2~5°C 냉장, 개봉 후 냉장 1주",
+      "story": "매콤한 양념에 버무린 꽃게장입니다. 칼칼하고 달큰한 양념이 게살과 어우러집니다.",
+      "weights": [ { "g": 500, "price": 27000 }, { "g": 1000, "price": 50000 } ],
+      "rating": 4.6, "coldChain": true, "svg": "crab",
+      "reviews": [
+        { "author": "매운거좋아", "rating": 5, "text": "달콤매콤 최고. 밥 두공기 뚝딱." }
+      ]
+    },
+    {
+      "id": "p-saeujeot-mini",
+      "name": "새우젓 소용량 3종 시식팩",
+      "category": "saeujeot", "categoryLabel": "새우젓",
+      "artisanId": "a-gwangcheon",
+      "origin": "충남 홍성 광천", "originCountry": "국산(서해)",
+      "spice": 0, "uses": ["rice", "gift"], "giftEligible": true,
+      "storage": "0~10°C 냉장, 개봉 후 냉장 2개월",
+      "story": "육젓·오젓·추젓을 소량씩 맛볼 수 있는 시식팩입니다. 처음 주문하는 분께 추천합니다.",
+      "weights": [ { "g": 300, "price": 15000 } ],
+      "rating": 4.7, "coldChain": true, "svg": "shrimp",
+      "reviews": [
+        { "author": "처음이에요", "rating": 5, "text": "종류별로 맛보기 좋아요. 육젓이 제일!" }
+      ]
+    },
+    {
+      "id": "p-agwi",
+      "name": "아가미젓 (김장 감칠맛)",
+      "category": "agwi", "categoryLabel": "아가미젓",
+      "artisanId": "a-yeosu",
+      "origin": "전남 여수", "originCountry": "국산(남해)",
+      "spice": 1, "uses": ["cook"], "giftEligible": false,
+      "storage": "0~10°C 냉장, 개봉 후 냉장 2개월",
+      "story": "생선 아가미로 담근 진한 젓갈입니다. 무채와 함께 무치거나 김장 양념에 넣어 깊은 맛을 더합니다.",
+      "weights": [ { "g": 300, "price": 10000 }, { "g": 500, "price": 16000 } ],
+      "rating": 4.4, "coldChain": true, "svg": "hairtail",
+      "reviews": [
+        { "author": "김장전문", "rating": 4, "text": "무채랑 무치면 밥반찬으로도 좋아요." }
+      ]
+    },
+    {
+      "id": "p-myeongnan-whole",
+      "name": "명란 통알 특大 (선물용)",
+      "category": "myeongnan", "categoryLabel": "명란젓",
+      "artisanId": "a-busan",
+      "origin": "부산 기장 대변항", "originCountry": "국산(원료 명태알)",
+      "spice": 1, "uses": ["gift"], "giftEligible": true,
+      "storage": "-2~5°C 냉장, 개봉 후 냉장 2주",
+      "story": "알이 굵고 형태가 온전한 특대 통알만 선별했습니다. 프리미엄 선물 포장으로 제공됩니다.",
+      "weights": [ { "g": 300, "price": 32000 }, { "g": 500, "price": 49000 } ],
+      "rating": 4.9, "coldChain": true, "svg": "roe",
+      "reviews": [
+        { "author": "선물의정석", "rating": 5, "text": "포장이 고급스럽고 알이 정말 큽니다." }
+      ]
+    },
+    {
+      "id": "p-hae-myeongnan",
+      "name": "명란 오일절임 (파스타용)",
+      "category": "myeongnan", "categoryLabel": "명란젓",
+      "artisanId": "a-busan",
+      "origin": "부산 기장", "originCountry": "국산(원료 명태알)",
+      "spice": 1, "uses": ["cook", "gift"], "giftEligible": true,
+      "storage": "냉장 보관, 개봉 후 냉장 3주",
+      "story": "명란을 올리브오일에 절여 요리에 바로 쓰기 좋게 만들었습니다. 파스타, 바게트, 아보카도 토스트에 어울립니다.",
+      "weights": [ { "g": 180, "price": 17000 }, { "g": 300, "price": 27000 } ],
+      "rating": 4.7, "coldChain": true, "svg": "roe",
+      "reviews": [
+        { "author": "홈쿡", "rating": 5, "text": "명란파스타 진짜 쉽게 완성. 바게트에도 최고." }
+      ]
+    },
+    {
+      "id": "p-tomak",
+      "name": "토하젓 (민물새우젓)",
+      "category": "toha", "categoryLabel": "토하젓",
+      "artisanId": "a-yeosu",
+      "origin": "전남 강진", "originCountry": "국산(민물)",
+      "spice": 1, "uses": ["rice", "gift"], "giftEligible": true,
+      "storage": "0~10°C 냉장, 개봉 후 냉장 2개월",
+      "story": "청정 민물에서 자란 토하로 담근 귀한 젓갈입니다. 남도 한정식의 밑반찬으로 유명한 별미입니다.",
+      "weights": [ { "g": 150, "price": 20000 }, { "g": 250, "price": 31000 } ],
+      "rating": 4.8, "coldChain": true, "svg": "shrimp",
+      "reviews": [
+        { "author": "한정식러", "rating": 5, "text": "남도 한정식 그 맛. 귀한 토하젓 온라인에서 사다니." }
+      ]
+    },
+    {
+      "id": "p-ojingeo-sikhae",
+      "name": "오징어 식해 (함경도식)",
+      "category": "sikhae", "categoryLabel": "식해",
+      "artisanId": "a-tongyeong",
+      "origin": "강원 속초", "originCountry": "국산(동해)",
+      "spice": 2, "uses": ["rice"], "giftEligible": true,
+      "storage": "0~5°C 냉장, 개봉 후 냉장 2주",
+      "story": "오징어와 좁쌀밥을 함께 삭힌 함경도식 식해입니다. 새콤달콤 매콤한 실향민의 손맛을 담았습니다.",
+      "weights": [ { "g": 300, "price": 14000 }, { "g": 500, "price": 23000 } ],
+      "rating": 4.6, "coldChain": true, "svg": "squid",
+      "reviews": [
+        { "author": "속초출신", "rating": 5, "text": "고향 맛 그대로. 새콤달콤 밥에 비벼먹으면 끝." }
+      ]
+    },
+    {
+      "id": "p-gajami-sikhae",
+      "name": "가자미 식해",
+      "category": "sikhae", "categoryLabel": "식해",
+      "artisanId": "a-tongyeong",
+      "origin": "강원 속초", "originCountry": "국산(동해)",
+      "spice": 2, "uses": ["rice"], "giftEligible": true,
+      "storage": "0~5°C 냉장, 개봉 후 냉장 2주",
+      "story": "쫄깃한 가자미를 좁쌀, 무와 함께 삭힌 강원도 향토 식해입니다. 밥반찬과 술안주로 사랑받습니다.",
+      "weights": [ { "g": 300, "price": 15000 }, { "g": 500, "price": 25000 } ],
+      "rating": 4.7, "coldChain": true, "svg": "hairtail",
+      "reviews": [
+        { "author": "강원도맛", "rating": 5, "text": "쫄깃하고 매콤달콤. 자꾸 손이 가요." }
+      ]
+    },
+    {
+      "id": "p-abai",
+      "name": "명태 서거리깍두기 (아가미)",
+      "category": "sikhae", "categoryLabel": "식해",
+      "artisanId": "a-tongyeong",
+      "origin": "강원 고성", "originCountry": "국산(동해)",
+      "spice": 2, "uses": ["rice"], "giftEligible": false,
+      "storage": "0~5°C 냉장, 개봉 후 냉장 3주",
+      "story": "명태 아가미와 무를 버무린 강원도식 서거리깍두기입니다. 오독오독 씹히는 식감과 칼칼한 맛이 일품입니다.",
+      "weights": [ { "g": 400, "price": 13000 }, { "g": 700, "price": 21000 } ],
+      "rating": 4.5, "coldChain": true, "svg": "squid",
+      "reviews": [
+        { "author": "동해바다", "rating": 5, "text": "무가 아삭하고 아가미가 오독오독. 밥반찬 최고." }
+      ]
+    }
+  ]
+}
