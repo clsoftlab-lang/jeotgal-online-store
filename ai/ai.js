@@ -11,8 +11,11 @@
 // - AI_ENDPOINT 가 설정되면 → { task, payload } 를 그 프록시로 POST 하고
 //   응답 본문을 스트리밍으로 읽어 onToken 으로 흘려보냅니다.
 //   (실제 Claude 호출과 API 키는 오직 서버 측에서만 처리됩니다.)
+// - 무인(never-breaks): 엔드포인트 호출 실패 / 429 {fallback:true} / 네트워크 오류 시
+//   자동으로 아래 결정론적 목업으로 폴백하므로, 앱은 어떤 경우에도 끊기지 않습니다.
 //
-// 지원 task: "chat"(추천·요리 도우미), "giftset"(선물세트 구성), "copy"(스토리 카피).
+// 지원 task: "chat"(추천·요리 도우미), "giftset"(선물세트 구성), "copy"(스토리 카피),
+//            "daily"(오늘의 추천 젓갈 + 요리 팁 — 무인 자동 다이제스트).
 
 import { calcShipping, summarizeWeight } from "../shipping.js";
 import { AI_ENDPOINT } from "./config.js";
@@ -26,8 +29,19 @@ import { AI_ENDPOINT } from "./config.js";
  * @returns {Promise<string>} 최종 전체 텍스트
  */
 export async function askAI(task, payload = {}, { onToken } = {}) {
-  if (AI_ENDPOINT_VALUE()) {
-    return streamFromEndpoint(task, payload, onToken);
+  const endpoint = AI_ENDPOINT_VALUE();
+  if (endpoint) {
+    try {
+      return await streamFromEndpoint(endpoint, task, payload, onToken);
+    } catch (err) {
+      // 무인 자동 폴백: 서버 오류/429{fallback:true}/네트워크 오류(스트림 시작 전) → 목업.
+      // 이미 토큰이 흘러간 뒤의 스트림 중단은 폴백하지 않고 오류를 상위로 올린다(중복 방지).
+      if (!err || !err.fallback) throw err;
+      if (typeof console !== "undefined" && console.warn) {
+        console.warn("[askAI] 엔드포인트 폴백 → 목업:", err.message || err);
+      }
+      // 아래 목업 경로로 진행.
+    }
   }
   const text = buildMock(task, payload);
   await emit(text, onToken);
@@ -40,15 +54,29 @@ function AI_ENDPOINT_VALUE() {
 
 /* ===================== 실서버(프록시) 스트리밍 ===================== */
 
-async function streamFromEndpoint(task, payload, onToken) {
-  const res = await fetch(AI_ENDPOINT_VALUE(), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ task, payload })
-  });
+// 폴백 가능 오류 표시: err.fallback === true 이면 askAI 가 목업으로 대체한다.
+function fallbackError(message) {
+  const e = new Error(message);
+  e.fallback = true;
+  return e;
+}
+
+async function streamFromEndpoint(endpoint, task, payload, onToken) {
+  let res;
+  try {
+    res = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ task, payload })
+    });
+  } catch (netErr) {
+    // 네트워크 오류 → 폴백(스트림 시작 전).
+    throw fallbackError(`AI 서버 네트워크 오류 — ${netErr?.message || netErr}`);
+  }
   if (!res.ok) {
+    // 429 {fallback:true} 를 포함한 모든 비정상 응답 → 폴백(스트림 시작 전).
     const detail = await safeText(res);
-    throw new Error(`AI 서버 오류 ${res.status}${detail ? " — " + detail : ""}`);
+    throw fallbackError(`AI 서버 오류 ${res.status}${detail ? " — " + detail : ""}`);
   }
   // 스트리밍 본문을 청크 단위로 읽어 흘려보낸다.
   if (!res.body || typeof res.body.getReader !== "function") {
@@ -59,17 +87,25 @@ async function streamFromEndpoint(task, payload, onToken) {
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let full = "";
-  for (;;) {
-    const { value, done } = await reader.read();
-    if (done) break;
-    const chunk = decoder.decode(value, { stream: true });
-    if (chunk) {
-      full += chunk;
-      if (typeof onToken === "function") onToken(chunk);
+  let emittedAny = false;
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+      if (chunk) {
+        full += chunk;
+        emittedAny = true;
+        if (typeof onToken === "function") onToken(chunk);
+      }
     }
+    const tail = decoder.decode();
+    if (tail) { full += tail; if (typeof onToken === "function") onToken(tail); }
+  } catch (streamErr) {
+    // 스트림 도중 오류: 아직 아무것도 안 흘렸으면 폴백, 이미 흘렸으면 중복 방지 위해 그대로 올림.
+    if (!emittedAny) throw fallbackError(`AI 스트림 오류 — ${streamErr?.message || streamErr}`);
+    throw streamErr;
   }
-  const tail = decoder.decode();
-  if (tail) { full += tail; if (typeof onToken === "function") onToken(tail); }
   return full;
 }
 
@@ -99,6 +135,7 @@ function buildMock(task, payload) {
     case "chat":    return mockChat(payload);
     case "giftset": return mockGiftset(payload);
     case "copy":    return mockCopy(payload);
+    case "daily":   return mockDaily(payload);
     default:        return `지원하지 않는 요청 유형입니다: ${task}`;
   }
 }
@@ -184,6 +221,36 @@ function eatingTip(p) {
   if (!bits.length) bits.push("차게 두었다가 소량씩 곁들여 드세요");
   const storage = p.storage ? ` (보관: ${p.storage})` : "";
   return bits.join(", ") + storage;
+}
+
+/* ---------- (1b) 오늘의 추천 젓갈 + 요리 팁 (무인 자동 다이제스트) ---------- */
+// 앱 로드 시 자동 생성되는 작은 다이제스트. products/artisans 에 근거하며,
+// payload.seed(오늘 날짜 등)로 결정론적으로 하루 단위 추천을 고른다. 목업 오프라인 동작.
+function mockDaily(payload) {
+  const products = Array.isArray(payload.products) ? payload.products : [];
+  const artisans = Array.isArray(payload.artisans) ? payload.artisans : [];
+  if (!products.length) {
+    return "오늘의 추천을 준비하지 못했어요. 잠시 후 다시 시도해 주세요.";
+  }
+  // seed(예: "2026-09-17") 해시로 결정론적 인덱스 → 하루 동안 동일 추천.
+  const seed = String(payload.seed || payload.date || "");
+  let h = 0;
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  const p = products[h % products.length];
+  const artisan = artisans.find(a => a.id === p.artisanId) || {};
+  const spice = p.spiceLabel || spiceLabelFor(p.spice);
+  const eat = eatingTip(p);
+  const story = (p.story || "").split(/(?<=[.!?。])\s/)[0] || (p.story || "");
+  const quote = artisan.quote ? `“${artisan.quote}”` : "";
+
+  return [
+    `오늘의 추천 젓갈 — ${p.name}`,
+    `📍 ${p.origin || "산지 미상"} · 맵기 ${spice} · ${won(minPriceOf(p))}~`,
+    "",
+    `• 오늘의 요리 팁: ${eat}`,
+    story ? `• 명인 한마디: ${story}` : "",
+    quote ? `  ${quote}` : ""
+  ].filter(Boolean).join("\n");
 }
 
 /* ---------- (2) 선물세트 구성 추천 ---------- */

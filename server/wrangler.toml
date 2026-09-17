@@ -1,0 +1,22 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 CLSOFTLAB (씨엘소프트랩), Dr. Lee Il-guk (이일국)
+#
+# Cloudflare Workers 설정 — 무인·무료 티어 배포용.
+#   1) npm i -g wrangler        (또는 npx wrangler ...)
+#   2) cd server
+#   3) wrangler secret put ANTHROPIC_API_KEY   # 키는 시크릿으로만! (코드/저장소 금지)
+#   4) wrangler deploy
+#   5) ai/config.js 의 AI_ENDPOINT 를 배포된 주소(.../api/ai)로 설정
+#
+# ⚠️ ANTHROPIC_API_KEY 는 절대 [vars] 나 이 파일에 넣지 마세요. 반드시 `wrangler secret put` 으로.
+
+name = "jeotgal-ai"
+main = "worker.js"
+compatibility_date = "2024-11-01"
+
+# 비용 우선 기본값. 품질을 높이려면 claude-sonnet-5 / claude-opus-5 로 변경.
+[vars]
+AI_MODEL = "claude-haiku-4-5"
+AI_EFFORT = "low"
+AI_RATE_PER_MIN = "20"
+# ALLOW_ORIGIN = "https://clsoftlab-lang.github.io"

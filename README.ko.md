@@ -64,7 +64,7 @@ totalGrams, destination, coldChain, jeju, zone})`는 `{ fee, free, breakdown }`�
 **실제 Claude 연동**은 선택 사항인 [`server/`](./server/README.md) 프록시로 켭니다:
 
 1. `cd server && npm install`
-2. `cp .env.example .env` 후 `ANTHROPIC_API_KEY` 설정 (모델 `claude-opus-5`, 적응형 사고, 스트리밍)
+2. `cp .env.example .env` 후 `ANTHROPIC_API_KEY` 설정 (기본 모델 `claude-haiku-4-5`, prompt caching, 스트리밍)
 3. `npm start` (기본 `http://localhost:8787/api/ai`)
 4. `ai/config.js`의 `AI_ENDPOINT`를 그 주소로 설정
 
@@ -73,6 +73,30 @@ totalGrams, destination, coldChain, jeju, zone})`는 `{ fee, free, breakdown }`�
 > **🔐 키는 서버 측에만.** `ANTHROPIC_API_KEY`는 오직 **서버 측 환경변수**로만 존재합니다.
 > API 키를 브라우저, `ai/config.js`, 저장소(git)에 **절대** 넣지 마세요. `.env`는 git에서 제외되며,
 > `check.mjs`는 저장소에서 실제 키 형식이 발견되면 빌드를 실패시킵니다.
+
+## ⚙️ 고도화 — 무인·저비용 실 AI 연동
+
+AI 레이어를 **무인 · 저비용 · 실 AI** 원칙으로 고도화했습니다:
+
+- **비용 우선 기본 모델** — `claude-haiku-4-5` (**$1 / $5 per MTok**). `AI_MODEL`로 교체 가능하며,
+  품질을 높이려면 `claude-sonnet-5` / `claude-opus-5`로 상향합니다.
+- **Prompt caching** — 안정적인 task 별 시스템 프롬프트를 `cache_control:{type:"ephemeral"}` 블록으로
+  보내 반복 호출 시 캐시 히트로 비용을 낮춥니다.
+- **출력 상한 + 가드레일** — task 별 `max_tokens`(기본 약 700), IP당 **레이트리밋**(`AI_RATE_PER_MIN`,
+  기본 20/분), **월간 토큰 예산**(`AI_MONTHLY_TOKEN_CAP`, 기본 2,000,000). 초과 시 프록시가
+  HTTP 429 `{fallback:true}`를 반환합니다.
+- **대략적 비용** — Haiku 4.5 + 캐싱 기준, 그라운딩 요청 1건은 대략 입력 ~1.5k / 출력 ~0.5k 토큰 수준이라
+  **1,000요청당 대략 ~$4–5**(예시값, 캐시 히트 시 더 낮아짐)입니다.
+- **무인 무료 호스팅** — **Cloudflare Workers** 변형(`server/worker.js` + `server/wrangler.toml`)이
+  Anthropic REST API를 직접 호출합니다. `wrangler deploy` 한 번으로 배포하고 키는
+  `wrangler secret put ANTHROPIC_API_KEY`로 넣으면 됩니다(상시 서버 불필요). [`server/README.md`](./server/README.md) 참고.
+- **절대 끊기지 않음(무인)** — 엔드포인트 실패 / 429 `{fallback:true}` / 네트워크 오류 시
+  `ai/ai.js`가 **자동으로 오프라인 목업으로 폴백**하므로 앱은 무중단으로 동작합니다.
+- **자동 기능** — 카탈로그 로드 시 실제 상품/명인 데이터로 `askAI("daily", …)`를 호출해
+  **"오늘의 추천 젓갈 + 요리 팁"** 다이제스트를 자동 생성합니다. 목업(오프라인)에서도 동작하고,
+  `AI_ENDPOINT` 설정 시 자동으로 실 Claude로 승격됩니다.
+
+> **🔐 API keys are server-side only — never in the browser or repo.**
 
 ## 로컬 실행
 
@@ -101,7 +125,8 @@ storage.js          안전한 localStorage 래퍼 (try/catch + 초기화)
 svg.js              인라인 SVG 상품/명인 아트
 ai/config.js        AI_ENDPOINT 스위치 ("" = 데모/목업)
 ai/ai.js            askAI() 어댑터: 결정론적 한국어 목업 또는 AI_ENDPOINT 스트리밍
-server/index.mjs    선택 사항 Claude 프록시(@anthropic-ai/sdk); 키는 서버 측에만
+server/index.mjs    선택 사항 Claude 프록시(@anthropic-ai/sdk); 비용우선 Haiku 기본·캐싱·상한
+server/worker.js    Cloudflare Workers 변형(무료·무인) — REST + wrangler.toml
 server/package.json + .env.example + README.md
 data/products.json  가상 상품 26종
 data/artisans.json  가상 명인 5인

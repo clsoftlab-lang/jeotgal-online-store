@@ -432,6 +432,7 @@ function productSummary(p) {
   return {
     id: p.id,
     name: p.name,
+    artisanId: p.artisanId,
     categoryLabel: p.categoryLabel,
     origin: p.origin,
     originCountry: p.originCountry,
@@ -449,6 +450,32 @@ function productSummary(p) {
 }
 function artisanSummary(a) {
   return { id: a.id, name: a.name, village: a.village, specialty: a.specialty, quote: a.quote, story: a.story };
+}
+
+/* ---------- 무인 자동 다이제스트: 오늘의 추천 젓갈 + 요리 팁 ---------- */
+// 앱 로드 시 카탈로그 상단 배너에 자동 생성. askAI("daily")로 동작하므로
+// 목업(오프라인)에서도 그대로 작동하고, 실서버 연동 시 자동으로 실 AI 로 승격된다.
+let dailyDone = false;
+async function renderDailyPick() {
+  const el = $("#daily-pick");
+  if (!el || dailyDone) return;
+  if (!DB.products.length) return;
+  dailyDone = true;
+  const out = $("#daily-pick-body");
+  if (out) out.textContent = "오늘의 추천을 준비하고 있어요…";
+  const payload = {
+    seed: new Date().toISOString().slice(0, 10),   // 하루 단위 결정론적 추천
+    products: DB.products.map(productSummary),
+    artisans: DB.artisans.map(artisanSummary)
+  };
+  try {
+    if (out) out.textContent = "";
+    await askAI("daily", payload, { onToken: (chunk) => { if (out) out.textContent += chunk; } });
+  } catch (err) {
+    // 무인 원칙: 실패해도 배너만 조용히 숨기고 앱은 정상 동작.
+    console.warn("daily pick failed:", err);
+    el.hidden = true;
+  }
 }
 
 let aiTab = "chat";
@@ -647,6 +674,7 @@ async function init() {
   }
   renderFilters();
   renderGrid();
+  renderDailyPick();
   renderGiftsets();
   renderArtisans();
   renderCartBadge();

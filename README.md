@@ -70,7 +70,7 @@ browser, with simulated streaming.
 **Enable real Claude** via the optional proxy in [`server/`](./server/README.md):
 
 1. `cd server && npm install`
-2. `cp .env.example .env` and set `ANTHROPIC_API_KEY` (model: `claude-opus-5`, adaptive thinking, streaming)
+2. `cp .env.example .env` and set `ANTHROPIC_API_KEY` (default model: `claude-haiku-4-5`, prompt caching, streaming)
 3. `npm start` (defaults to `http://localhost:8787/api/ai`)
 4. set `AI_ENDPOINT` in `ai/config.js` to that URL
 
@@ -79,6 +79,30 @@ Then `askAI` POSTs `{task, payload}` to `AI_ENDPOINT` and streams the response.
 > **🔐 Keys are server-side only.** The `ANTHROPIC_API_KEY` lives **only** as a server-side environment
 > variable. **Never** put an API key in the browser, in `ai/config.js`, or in the repository. `.env` is
 > git-ignored, and `check.mjs` fails the build if a real key format is found anywhere in the repo.
+
+## ⚙️ 고도화 — 무인·저비용 실 AI 연동
+
+The AI layer is tuned for **autonomous, low-cost, real Claude** (무인 · 저비용 · 실 AI):
+
+- **비용 우선 기본 모델** — `claude-haiku-4-5` (**$1 / $5 per MTok**), configurable via `AI_MODEL`
+  (raise to `claude-sonnet-5` / `claude-opus-5` for higher quality).
+- **Prompt caching** — the stable per-task system prompt is sent as a `cache_control:{type:"ephemeral"}`
+  block, so repeated calls hit cache and cost less.
+- **Output caps + guardrails** — modest per-task `max_tokens` (default ~700), a per-IP **rate limit**
+  (`AI_RATE_PER_MIN`, default 20/min) and a **monthly token budget** (`AI_MONTHLY_TOKEN_CAP`, default
+  2,000,000). On excess the proxy returns HTTP 429 `{fallback:true}`.
+- **Rough cost** — with Haiku 4.5 + caching, a grounded request is on the order of ~1.5k in / ~0.5k out
+  tokens, i.e. **roughly ~$4–5 per 1,000 requests** (illustrative; caching pushes it lower on repeats).
+- **무인 free hosting** — a **Cloudflare Workers** variant (`server/worker.js` + `server/wrangler.toml`)
+  calls the Anthropic REST API directly; deploy once with `wrangler deploy` and set the key via
+  `wrangler secret put ANTHROPIC_API_KEY` — no server to babysit. See [`server/README.md`](./server/README.md).
+- **Never breaks (무인)** — if the endpoint fails / returns 429 `{fallback:true}` / has a network error,
+  `ai/ai.js` **auto-falls back to the offline mock**, so the app keeps working unmanned.
+- **Autonomous feature** — on catalog load the app shows an auto-generated **"오늘의 추천 젓갈 + 요리 팁"**
+  digest, built from the real products/artisans via `askAI("daily", …)`, so it works offline via the mock
+  and upgrades to real Claude automatically when `AI_ENDPOINT` is set.
+
+> **🔐 API keys are server-side only — never in the browser or repo.**
 
 ## Run locally
 
@@ -106,7 +130,8 @@ storage.js          safe localStorage wrapper (try/catch + reset)
 svg.js              inline-SVG product/artisan artwork
 ai/config.js        AI_ENDPOINT switch ("" = demo/mock)
 ai/ai.js            askAI() adapter: deterministic Korean mock, or streams from AI_ENDPOINT
-server/index.mjs    optional Claude proxy (@anthropic-ai/sdk); key stays server-side
+server/index.mjs    optional Claude proxy (@anthropic-ai/sdk); cost-first Haiku default, caching, caps
+server/worker.js    Cloudflare Workers variant (free, unmanned) — REST + wrangler.toml
 server/package.json + .env.example + README.md
 data/products.json  26 fictional products
 data/artisans.json  5 fictional artisans
