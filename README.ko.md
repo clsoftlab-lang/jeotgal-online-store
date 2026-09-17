@@ -47,6 +47,33 @@ totalGrams, destination, coldChain, jeju, zone})`는 `{ fee, free, breakdown }`�
 무료가 없습니다. `summarizeWeight(lines)`는 장바구니 무게와 콜드체인 포함 여부를 집계합니다.
 이 모든 로직은 `check.mjs`에서 단위 테스트됩니다.
 
+## 🤖 AI 기능 (API 연동)
+
+**안전하고 교체 가능한 AI 레이어**("AI-KIT")를 기본 탑재했으며, 새 **AI 도우미** 탭에서 세 기능을
+사용할 수 있습니다:
+
+1. **AI 젓갈 추천·요리 도우미 챗봇** — 상품 추천 + 먹는 법/요리법 안내.
+2. **선물세트 구성 추천** — 예산·받는 분·취향으로 세트 구성 제안.
+3. **상품/산지 스토리 카피 생성** — 상품 + 명인 데이터로 카피 작성.
+
+**데모 = 목업(mock), 서버·키 불필요.** 기본값으로 `ai/config.js`의 `AI_ENDPOINT = ""`이며,
+`ai/ai.js`의 `askAI(task, payload, {onToken})`가 **결정론적 한국어 MockProvider**로 응답합니다.
+이 목업은 앱의 실제 상품/명인 데이터와 `shipping.js` 배송 엔진을 그대로 재사용하므로, 서버·키·
+네트워크 없이 브라우저에서 (스트리밍 연출과 함께) 완전히 동작합니다.
+
+**실제 Claude 연동**은 선택 사항인 [`server/`](./server/README.md) 프록시로 켭니다:
+
+1. `cd server && npm install`
+2. `cp .env.example .env` 후 `ANTHROPIC_API_KEY` 설정 (모델 `claude-opus-5`, 적응형 사고, 스트리밍)
+3. `npm start` (기본 `http://localhost:8787/api/ai`)
+4. `ai/config.js`의 `AI_ENDPOINT`를 그 주소로 설정
+
+이후 `askAI`는 `{task, payload}`를 `AI_ENDPOINT`로 POST 하고 응답을 스트리밍으로 받습니다.
+
+> **🔐 키는 서버 측에만.** `ANTHROPIC_API_KEY`는 오직 **서버 측 환경변수**로만 존재합니다.
+> API 키를 브라우저, `ai/config.js`, 저장소(git)에 **절대** 넣지 마세요. `.env`는 git에서 제외되며,
+> `check.mjs`는 저장소에서 실제 키 형식이 발견되면 빌드를 실패시킵니다.
+
 ## 로컬 실행
 
 빌드가 필요 없습니다. ES 모듈과 `fetch`는 `file://`이 아니라 `http://`가 필요하므로 HTTP로
@@ -66,16 +93,20 @@ node check.mjs
 ## 파일 구성
 
 ```
-index.html          UI 골격 + 모든 뷰 컨테이너
+index.html          UI 골격 + 모든 뷰 컨테이너 (AI 도우미 탭 포함)
 styles.css          반응형 라이트/다크 스타일
 app.js              앱 로직·렌더링·라우팅 (ES 모듈)
 shipping.js         순수 배송비 계산기 + 무게 집계
 storage.js          안전한 localStorage 래퍼 (try/catch + 초기화)
 svg.js              인라인 SVG 상품/명인 아트
+ai/config.js        AI_ENDPOINT 스위치 ("" = 데모/목업)
+ai/ai.js            askAI() 어댑터: 결정론적 한국어 목업 또는 AI_ENDPOINT 스트리밍
+server/index.mjs    선택 사항 Claude 프록시(@anthropic-ai/sdk); 키는 서버 측에만
+server/package.json + .env.example + README.md
 data/products.json  가상 상품 26종
 data/artisans.json  가상 명인 5인
 data/giftsets.json  선물세트 프리셋 4종
-check.mjs           CI 검증 + 배송 단위 테스트
+check.mjs           CI 검증 + 배송 단위 테스트 + AI 레이어 검사
 .github/workflows/ci.yml   node check.mjs 실행
 ```
 
@@ -90,6 +121,8 @@ check.mjs           CI 검증 + 배송 단위 테스트
 - **상태는 데이터베이스가 아니라 브라우저 `localStorage`에 저장됩니다.** 사이트 데이터를 지우거나
   다른 기기/브라우저를 쓰면 초기화됩니다. 푸터에 초기화 버튼이 있습니다.
 - **계정·로그인이 없고, 개인정보(PII)를 수집·저장하지 않습니다.**
+- **AI 응답은 기본적으로 결정론적 로컬 목업**입니다(서버·API 키·네트워크 없음). 실제 Claude는
+  `server/` + 서버 측 `ANTHROPIC_API_KEY`로 선택 연동하며, 키는 브라우저·저장소에 절대 노출되지 않습니다.
 - 실제 프로덕션 빌드에는 백엔드 + 실제 데이터베이스, 검증된 카탈로그·재고, 실제 결제 게이트웨이,
   인증 계정, 실제 콜드체인 배송 연동이 추가됩니다.
 

@@ -53,6 +53,33 @@ keep cold-chain and Jeju surcharges. Overseas fees are `zone.base + ceil(kg) * z
 (+ cold-chain surcharge), never free. `summarizeWeight(lines)` aggregates cart weight and
 cold-chain status. All of this is unit-tested in `check.mjs`.
 
+## 🤖 AI 기능 (API 연동)
+
+The store ships a **secure, pluggable AI layer** (the "AI-KIT") with three features, wired into a new
+**AI 도우미** tab:
+
+1. **AI 젓갈 추천·요리 도우미 챗봇** — recommends products and how to eat/cook with them.
+2. **선물세트 구성 추천** — proposes a gift-set composition from budget / recipient / taste.
+3. **상품/산지 스토리 카피 생성** — generates marketing copy from a product + its artisan.
+
+**Demo = mock, no server, no key.** By default `ai/config.js` exports `AI_ENDPOINT = ""`, so
+`ai/ai.js`'s `askAI(task, payload, {onToken})` runs a **deterministic Korean MockProvider** that reuses
+the app's real products/artisans and the `shipping.js` engine — the UI works fully offline, in the
+browser, with simulated streaming.
+
+**Enable real Claude** via the optional proxy in [`server/`](./server/README.md):
+
+1. `cd server && npm install`
+2. `cp .env.example .env` and set `ANTHROPIC_API_KEY` (model: `claude-opus-5`, adaptive thinking, streaming)
+3. `npm start` (defaults to `http://localhost:8787/api/ai`)
+4. set `AI_ENDPOINT` in `ai/config.js` to that URL
+
+Then `askAI` POSTs `{task, payload}` to `AI_ENDPOINT` and streams the response.
+
+> **🔐 Keys are server-side only.** The `ANTHROPIC_API_KEY` lives **only** as a server-side environment
+> variable. **Never** put an API key in the browser, in `ai/config.js`, or in the repository. `.env` is
+> git-ignored, and `check.mjs` fails the build if a real key format is found anywhere in the repo.
+
 ## Run locally
 
 No build step. Serve the folder over HTTP (ES modules + `fetch` need `http://`, not `file://`):
@@ -71,16 +98,20 @@ node check.mjs
 ## Files
 
 ```
-index.html          UI shell + all view containers
+index.html          UI shell + all view containers (incl. AI 도우미 tab)
 styles.css          responsive light/dark styles
 app.js              app logic, rendering, routing (ES module)
 shipping.js         pure shipping-fee calculator + weight summary
 storage.js          safe localStorage wrapper (try/catch + reset)
 svg.js              inline-SVG product/artisan artwork
+ai/config.js        AI_ENDPOINT switch ("" = demo/mock)
+ai/ai.js            askAI() adapter: deterministic Korean mock, or streams from AI_ENDPOINT
+server/index.mjs    optional Claude proxy (@anthropic-ai/sdk); key stays server-side
+server/package.json + .env.example + README.md
 data/products.json  26 fictional products
 data/artisans.json  5 fictional artisans
 data/giftsets.json  4 gift-set presets
-check.mjs           CI checks + shipping unit tests
+check.mjs           CI checks + shipping unit tests + AI-layer checks
 .github/workflows/ci.yml   runs `node check.mjs`
 ```
 
@@ -96,6 +127,8 @@ check.mjs           CI checks + shipping unit tests
 - **State lives in your browser's `localStorage`, not a database.** Clearing site data or using
   another device/browser resets everything. There is a reset button in the footer.
 - **No accounts, no login, no personal data (PII) is collected or stored.**
+- **AI answers are a deterministic local mock by default** (no server, no API key, no network). Real
+  Claude is opt-in via `server/` + a server-side `ANTHROPIC_API_KEY`; keys never touch the browser or repo.
 - A real production build would add: a backend + real database, a verified catalog and inventory,
   a real payment gateway, authenticated accounts, and genuine cold-chain shipping integration.
 

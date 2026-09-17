@@ -6,6 +6,7 @@
 import { art, artisanBadge } from "./svg.js";
 import { calcShipping, summarizeWeight, SHIPPING_CONFIG } from "./shipping.js";
 import { load, save, resetAll } from "./storage.js";
+import { askAI } from "./ai/ai.js";
 
 /* ---------------- 상태 ---------------- */
 const DB = { products: [], artisans: [], giftsets: [], meta: {} };
@@ -425,6 +426,99 @@ function renderArtisans() {
     </article>`).join("");
 }
 
+/* ---------------- AI 도우미 ---------------- */
+// 상품을 payload용 경량 요약으로 변환(SVG/리뷰 등 무거운 필드는 제외).
+function productSummary(p) {
+  return {
+    id: p.id,
+    name: p.name,
+    categoryLabel: p.categoryLabel,
+    origin: p.origin,
+    originCountry: p.originCountry,
+    spice: p.spice,
+    spiceLabel: (DB.meta.spiceLabels || [])[p.spice] || "",
+    uses: p.uses,
+    giftEligible: p.giftEligible,
+    storage: p.storage,
+    story: p.story,
+    coldChain: p.coldChain,
+    rating: p.rating,
+    minPrice: Math.min(...p.weights.map(w => w.price)),
+    grams: p.weights[0]?.g || 250
+  };
+}
+function artisanSummary(a) {
+  return { id: a.id, name: a.name, village: a.village, specialty: a.specialty, quote: a.quote, story: a.story };
+}
+
+let aiTab = "chat";
+function renderAI() {
+  // 카피 생성용 상품 셀렉트 채우기(한 번만/데이터 로드 후).
+  const sel = $("#ai-copy-product");
+  if (sel && !sel.options.length) {
+    sel.innerHTML = DB.products.map(p => `<option value="${esc(p.id)}">${esc(p.name)}</option>`).join("");
+  }
+}
+
+// 공통 실행기: 스트리밍 토큰을 <pre> 출력에 흘려보낸다.
+async function runAI(task, payload, outputEl, btn) {
+  if (!outputEl) return;
+  outputEl.textContent = "";
+  outputEl.classList.add("streaming");
+  if (btn) btn.disabled = true;
+  try {
+    await askAI(task, payload, { onToken: (chunk) => { outputEl.textContent += chunk; } });
+  } catch (err) {
+    outputEl.textContent = `AI 응답 중 오류가 발생했습니다.\n${err?.message || err}`;
+    console.error(err);
+  } finally {
+    outputEl.classList.remove("streaming");
+    if (btn) btn.disabled = false;
+  }
+}
+
+function aiChat() {
+  const input = $("#ai-chat-input");
+  const msg = (input?.value || "").trim();
+  runAI("chat",
+    { message: msg, products: DB.products.map(productSummary), artisans: DB.artisans.map(artisanSummary) },
+    $("#ai-chat-output"), $("#ai-chat-send"));
+}
+
+function aiGiftset() {
+  const budget = Number($("#ai-gift-budget")?.value) || 0;
+  const recipient = ($("#ai-gift-recipient")?.value || "").trim();
+  const preference = ($("#ai-gift-pref")?.value || "").trim();
+  runAI("giftset",
+    {
+      budget, recipient, preference, boxPrice: 5000,
+      products: DB.products.filter(p => p.giftEligible).map(productSummary)
+    },
+    $("#ai-gift-output"), $("#ai-gift-send"));
+}
+
+function aiCopy() {
+  const id = $("#ai-copy-product")?.value;
+  const p = byId(id);
+  if (!p) { toast("상품을 선택하세요"); return; }
+  const tone = $("#ai-copy-tone")?.value || "정중한";
+  runAI("copy",
+    { product: productSummary(p), artisan: artisanSummary(artisanById(p.artisanId) || {}), tone },
+    $("#ai-copy-output"), $("#ai-copy-send"));
+}
+
+function switchAITab(tab) {
+  aiTab = tab;
+  document.querySelectorAll("[data-ai-tab]").forEach(b => {
+    const on = b.dataset.aiTab === tab;
+    b.classList.toggle("active", on);
+    b.setAttribute("aria-selected", on ? "true" : "false");
+  });
+  document.querySelectorAll("[data-ai-panel]").forEach(pnl => {
+    pnl.classList.toggle("active", pnl.dataset.aiPanel === tab);
+  });
+}
+
 /* ---------------- 찜 ---------------- */
 function toggleFav(id) {
   const i = wishlist.indexOf(id);
@@ -453,6 +547,7 @@ function showView(name) {
   document.querySelectorAll("[data-nav]").forEach(n => n.classList.toggle("active", n.dataset.nav === name));
   if (name === "cart") renderCart();
   if (name === "wishlist") renderWishlist();
+  if (name === "ai") renderAI();
   window.scrollTo(0, 0);
 }
 
@@ -496,6 +591,20 @@ function wireEvents() {
       if (line) { line.qty = Math.max(1, line.qty + Number(qbtn.dataset.d)); persist(); renderCart(); renderCartBadge(); }
       return;
     }
+    // AI 도우미 이벤트
+    const aiTabBtn = t.closest("[data-ai-tab]");
+    if (aiTabBtn) { switchAITab(aiTabBtn.dataset.aiTab); return; }
+    const aiQuick = t.closest("[data-ai-quick]");
+    if (aiQuick) {
+      const inp = $("#ai-chat-input");
+      if (inp) inp.value = aiQuick.dataset.aiQuick;
+      aiChat();
+      return;
+    }
+    if (t.id === "ai-chat-send") { aiChat(); return; }
+    if (t.id === "ai-gift-send") { aiGiftset(); return; }
+    if (t.id === "ai-copy-send") { aiCopy(); return; }
+
     if (t.id === "reset-data") {
       if (confirm("모든 로컬 데이터(장바구니·찜·선물세트)를 초기화할까요?")) {
         resetAll(); cart = []; wishlist = []; giftDraft = [];
@@ -505,8 +614,11 @@ function wireEvents() {
     }
   });
 
-  // 모달 esc
-  document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+  // 모달 esc + AI 챗봇 Enter 전송
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") closeModal();
+    if (e.key === "Enter" && e.target && e.target.id === "ai-chat-input") { e.preventDefault(); aiChat(); }
+  });
 
   // 배송 옵션 변경(위임: change)
   document.addEventListener("change", e => {
@@ -520,7 +632,7 @@ function wireEvents() {
 
 function route() {
   const name = (location.hash.replace("#", "") || "catalog");
-  const valid = ["catalog", "giftsets", "artisans", "wishlist", "cart"];
+  const valid = ["catalog", "giftsets", "ai", "artisans", "wishlist", "cart"];
   showView(valid.includes(name) ? name : "catalog");
 }
 

@@ -4,10 +4,10 @@
 // check.mjs — CI 검증: JSON 파싱 + `node --check` + index.html 컨테이너 + 배송 계산기 단위 테스트.
 // 실행:  node check.mjs
 
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync, readdirSync, statSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
+import { dirname, join, extname } from "node:path";
 import { calcShipping, summarizeWeight, SHIPPING_CONFIG } from "./shipping.js";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -149,6 +149,54 @@ eq("계산 순수성(재현성)", calcShipping(inp).fee, calcShipping(inp).fee);
 const bdCase = calcShipping({ subtotal: 10000, totalGrams: 3000, destination: "domestic", coldChain: true, jeju: true });
 eq("breakdown 합 == fee",
   Object.values(bdCase.breakdown).reduce((a, b) => a + b, 0), bdCase.fee);
+
+/* ---------- 6) AI 레이어 (ai/ + server/) ---------- */
+console.log("\n[6] AI 레이어");
+
+// 6a) node --check 로 ai/ 와 server/ 의 모든 JS/MJS 구문 검사
+for (const dir of ["ai", "server"]) {
+  const abs = join(ROOT, dir);
+  assert(`${dir}/ 디렉터리 존재`, existsSync(abs));
+  if (!existsSync(abs)) continue;
+  const files = readdirSync(abs).filter(f => f.endsWith(".js") || f.endsWith(".mjs"));
+  assert(`${dir}/ 에 JS 파일 존재`, files.length > 0);
+  for (const f of files) {
+    try {
+      execFileSync(process.execPath, ["--check", join(abs, f)], { stdio: "pipe" });
+      ok(`node --check ${dir}/${f}`);
+    } catch (e) { no(`node --check ${dir}/${f}`, (e.stderr || e.message).toString().slice(0, 200)); }
+  }
+}
+
+// 6b) AI_ENDPOINT 는 데모(빈 문자열)이어야 한다 — 키/서버가 저장소에 하드코딩되지 않도록.
+try {
+  const { AI_ENDPOINT } = await import("./ai/config.js");
+  eq("ai/config.js AI_ENDPOINT 빈 문자열(데모)", AI_ENDPOINT, "");
+} catch (e) {
+  no("ai/config.js import", e.message);
+}
+
+// 6c) 실제 API 키 형식이 저장소 어디에도 없어야 한다.
+//     (패턴을 조각으로 조립해 이 검사 파일 자체가 오탐되지 않도록 함.)
+const KEY_RE = new RegExp("sk-" + "ant-[A-Za-z0-9_-]{20,}");
+const SKIP_DIRS = new Set(["node_modules", ".git", ".cache", "tmp", "dist"]);
+const TEXT_EXT = new Set([".js", ".mjs", ".json", ".html", ".css", ".md", ".txt", ".yml", ".yaml", ".example", ""]);
+function walk(dir, acc = []) {
+  for (const entry of readdirSync(dir)) {
+    if (SKIP_DIRS.has(entry)) continue;
+    const p = join(dir, entry);
+    let st; try { st = statSync(p); } catch { continue; }
+    if (st.isDirectory()) walk(p, acc);
+    else if (TEXT_EXT.has(extname(entry).toLowerCase())) acc.push(p);
+  }
+  return acc;
+}
+let leaked = null;
+for (const file of walk(ROOT)) {
+  let content; try { content = readFileSync(file, "utf8"); } catch { continue; }
+  if (KEY_RE.test(content)) { leaked = file; break; }
+}
+assert("저장소에 실제 API 키 형식 없음", leaked === null, leaked ? `발견: ${leaked}` : "");
 
 /* ---------- 결과 ---------- */
 console.log(`\n===== 결과: ${pass} 통과, ${fail} 실패 =====`);

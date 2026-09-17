@@ -19,6 +19,7 @@
       <nav class="main-nav" aria-label="주요 메뉴">
         <a href="#catalog" data-nav="catalog">카탈로그</a>
         <a href="#giftsets" data-nav="giftsets">선물세트</a>
+        <a href="#ai" data-nav="ai">AI 도우미 <span class="badge ai-badge">AI</span></a>
         <a href="#artisans" data-nav="artisans">명인 소개</a>
         <a href="#wishlist" data-nav="wishlist">찜 <span id="wish-count" class="badge" style="display:none">0</span></a>
         <a href="#cart" data-nav="cart" class="cart-link">장바구니 <span id="cart-count" class="badge" style="display:none">0</span></a>
@@ -44,6 +45,59 @@
       <p class="muted">명인의 젓갈을 조합한 추천 세트, 또는 나만의 조합으로 선물세트를 만드세요.</p>
       <div id="giftset-presets" class="gift-grid"></div>
       <div id="giftset-builder" class="builder"></div>
+    </section>
+
+    <!-- AI 도우미 -->
+    <section id="view-ai" class="view" aria-label="AI 도우미">
+      <h1 class="view-title">AI 도우미 <span class="tag ai">DEMO · Mock</span></h1>
+      <p class="muted">서버·API 키 없이 동작하는 데모입니다. 앱의 실제 상품·명인 데이터와 배송 계산 엔진에 근거해
+        답합니다. 실제 Claude 연동은 <code>server/</code> + <code>ANTHROPIC_API_KEY</code>로 켤 수 있어요.</p>
+
+      <div class="ai-tabs" role="tablist" aria-label="AI 기능 선택">
+        <button class="ai-tab active" data-ai-tab="chat" role="tab" aria-selected="true">🍚 추천·요리 챗봇</button>
+        <button class="ai-tab" data-ai-tab="giftset" role="tab" aria-selected="false">🎁 선물세트 추천</button>
+        <button class="ai-tab" data-ai-tab="copy" role="tab" aria-selected="false">✍️ 스토리 카피 생성</button>
+      </div>
+
+      <!-- (1) 추천·요리 챗봇 -->
+      <div class="ai-panel active" data-ai-panel="chat">
+        <div class="ai-form">
+          <input id="ai-chat-input" type="text" placeholder="예: 밥반찬으로 안 매운 젓갈 추천해줘 / 찌개용 새우젓" aria-label="질문 입력">
+          <button class="btn primary" id="ai-chat-send">추천 받기</button>
+        </div>
+        <div class="ai-quick">
+          <button class="chip" data-ai-quick="밥반찬으로 안 매운 젓갈 추천해줘">밥반찬·순한맛</button>
+          <button class="chip" data-ai-quick="찌개·요리에 쓸 새우젓 알려줘">요리용 새우젓</button>
+          <button class="chip" data-ai-quick="부모님 선물로 좋은 젓갈">부모님 선물</button>
+        </div>
+        <pre class="ai-output" id="ai-chat-output" aria-live="polite"></pre>
+      </div>
+
+      <!-- (2) 선물세트 추천 -->
+      <div class="ai-panel" data-ai-panel="giftset">
+        <div class="ai-form ai-grid">
+          <label>예산(원)<input id="ai-gift-budget" type="number" min="0" step="1000" placeholder="예: 80000"></label>
+          <label>받는 분<input id="ai-gift-recipient" type="text" placeholder="예: 부모님, 거래처"></label>
+          <label>취향/조건<input id="ai-gift-pref" type="text" placeholder="예: 명란 좋아함, 안 매운"></label>
+          <button class="btn primary" id="ai-gift-send">선물세트 추천</button>
+        </div>
+        <pre class="ai-output" id="ai-gift-output" aria-live="polite"></pre>
+      </div>
+
+      <!-- (3) 스토리 카피 생성 -->
+      <div class="ai-panel" data-ai-panel="copy">
+        <div class="ai-form ai-grid">
+          <label>상품<select id="ai-copy-product" aria-label="상품 선택"></select></label>
+          <label>톤<select id="ai-copy-tone" aria-label="톤 선택">
+            <option value="정중한">정중한</option>
+            <option value="감성적인">감성적인</option>
+            <option value="활기찬">활기찬</option>
+            <option value="담백한">담백한</option>
+          </select></label>
+          <button class="btn primary" id="ai-copy-send">카피 생성</button>
+        </div>
+        <pre class="ai-output" id="ai-copy-output" aria-live="polite"></pre>
+      </div>
     </section>
 
     <!-- 명인 소개 -->

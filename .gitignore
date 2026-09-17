@@ -5,10 +5,16 @@ Thumbs.db
 .idea/
 .vscode/
 
-# Node (이 프로젝트는 no-build 정적 사이트이나 로컬 도구용)
+# Node (이 프로젝트는 no-build 정적 사이트이나 로컬 도구/AI 프록시용)
 node_modules/
 npm-debug.log*
 yarn-error.log*
+
+# 환경변수 / 비밀 (API 키는 절대 커밋 금지 — 서버 측 환경변수로만)
+.env
+.env.*
+!.env.example
+server/.env
 
 # 로그 / 임시
 *.log
